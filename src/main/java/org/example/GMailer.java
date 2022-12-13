@@ -93,7 +93,13 @@ public class GMailer
     }
 
     public static void main(String[] args) throws Exception {
-        new GMailer().sendMail("A second message", """
+
+        GMailer gmailer = new GMailer();
+        String name = "Tom";
+        int zahl= 5;
+
+        for(int i=0; i<zahl; i++) {
+            gmailer.sendMail("A second message " +i, """
                 Dear reader,
                                 
                 Hello world.
@@ -101,7 +107,10 @@ public class GMailer
                 Best regards,
                 myself
                 """);
-    }
+        }
+        }
+
+
 
 
 
