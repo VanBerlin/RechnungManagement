@@ -37,7 +37,7 @@ public class GMailer
 {
 
     private static final String TEST_EMAIL = "furi1837@gmail.com";
-    private static final String RECIPIENT_EMAIL = "HannesFandrich@gmail.com";
+    private static final String RECIPIENT_EMAIL = "furi1837@gmail.com";
     private final Gmail service;
 
     public GMailer() throws Exception {
@@ -90,25 +90,17 @@ public class GMailer
                 throw e;
             }
         }
-            Message readedMessage = new Message();
-            readedMessage = service.users().messages().gmailImport("me", readedMessage).execute();
-            System.out.println("Message id: " + readedMessage.getId());
-    }
-    private void getMail() {
     }
 
     public static void main(String[] args) throws Exception {
-        new GMailer().sendMail("A new message", """
+        new GMailer().sendMail("A second message", """
                 Dear reader,
-
+                                
                 Hello world.
-
+                                
                 Best regards,
                 myself
                 """);
-
-        GMailer receivingMailer = new GMailer();
-        receivingMailer.getMail();
     }
 
 
