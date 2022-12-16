@@ -18,12 +18,13 @@ import org.apache.commons.codec.binary.Base64;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.api.services.gmail.GmailScopes.GMAIL_SEND;
 import static javax.mail.Message.RecipientType.TO;
@@ -31,16 +32,15 @@ import static javax.mail.Message.RecipientType.TO;
 
 /**
  * Hello world!
- *
  */
-public class GMailer
-{
+public class GMailerFootlocker {
 
     private static final String TEST_EMAIL = "furi1837@gmail.com";
-    private static final String RECIPIENT_EMAIL = "furi1837@gmail.com";
+    private static final String RECIPIENT_EMAIL = "hannesfandrich@gmail.com";
+//    private static final String RECIPIENT_EMAIL = "service@footlocker.co.uk";
     private final Gmail service;
 
-    public GMailer() throws Exception {
+    public GMailerFootlocker() throws Exception {
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         service = new Gmail.Builder(httpTransport, jsonFactory, getCredentials(httpTransport, jsonFactory))
@@ -50,7 +50,7 @@ public class GMailer
 
     private static Credential getCredentials(final NetHttpTransport httpTransport, GsonFactory jsonFactory)
             throws IOException {
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(GMailer.class.getResourceAsStream("/client_secret_33861712024-d3dngs7jvj50n95972b51c7i7jfrd2u8.apps.googleusercontent.com.json")));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(GMailerFootlocker.class.getResourceAsStream("/client_secret_33861712024-d3dngs7jvj50n95972b51c7i7jfrd2u8.apps.googleusercontent.com.json")));
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, jsonFactory, clientSecrets, Set.of(GMAIL_SEND))
@@ -67,7 +67,7 @@ public class GMailer
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress(TEST_EMAIL));
-        email.addRecipient(TO, new InternetAddress(TEST_EMAIL));
+        email.addRecipient(TO, new InternetAddress(RECIPIENT_EMAIL));
         email.setSubject(subject);
         email.setText(message);
 
@@ -94,24 +94,50 @@ public class GMailer
 
     public static void main(String[] args) throws Exception {
 
-        GMailer gmailer = new GMailer();
-        String name = "Tom";
-        int zahl= 5;
+        GMailerFootlocker gmailer = new GMailerFootlocker();
 
-        for(int i=0; i<zahl; i++) {
-            gmailer.sendMail("A second message " +i, """
-                Dear reader,
-                                
-                Hello world.
-                                
-                Best regards,
-                myself
-                """);
+        String file = "C:\\Users\\Hanne\\IdeaProjects\\RechnungManagement\\src\\main\\resources\\FootlockerTemplate16.12_Teil2.csv";
+        BufferedReader reader = null;
+        String line = null;
+        Random random = new Random();
+        int i = 0;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split(",");
+                if (i > 0) {
+                    gmailer.sendMail(
+                            "Rechnung ",
+                            "Sehr geehrte Damen und Herren,\n\n" +
+                                    "ich benötige eine Rechnung für meine Bestellung.\n\n" +
+                                    "Meine Bestellinformationen sind:\n\n" +
+                                    row[1] + "\n" +
+                                    row[3] + "\n" +
+                                    row[4] + "\n" +
+                                    row[5] + "\n" +
+                                    "Email: " +
+                                    row[6] + "\n" +
+                                    "Order Nummer: " + row[0] + "\n\n" +
+
+                                    "Mit freundlichen Grüßen");
+                    row[7] = "sendet";
+                }
+                i++;
+                System.out.println("An Foot Locker verschickte Mail " + i);
+                int randomNumber = random.nextInt(10, 20);
+                TimeUnit.SECONDS.sleep(randomNumber);
+                System.out.println("Delay: " + randomNumber);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            reader.close();
         }
-        }
-
-
-
-
-
+    }
 }
+
+
+
+
+
+
